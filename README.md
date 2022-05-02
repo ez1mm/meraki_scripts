@@ -1,9 +1,5 @@
 # Meraki Scripts
 
-# m_contentFilter.py
-
-Meraki Content Filter tool
-
 ### Clone and setup
 
 ```bash
@@ -15,7 +11,18 @@ python -m pip install -r requirements.txt
 Edit config.py and add your API key. 
 https://documentation.meraki.com/General_Administration/Other_Topics/Cisco_Meraki_Dashboard_API
 
+# m_contentFilter.py
+
+Meraki Content Filter tool
+
 ## Usage
+### Setup filter lists
+```bash
+cd filterlists
+```
+Edit allowlist.txt and blocklist.txt in filterlists, one URL per line.
+
+### Options
 `m_contentFilter.py` example code to get, set or clear Meraki Network Content Filters
 ```
 usage: m_contentFilter.py [-h] [-o O] [-t T] [-c] [-v] [-d]
