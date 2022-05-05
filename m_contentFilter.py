@@ -136,7 +136,7 @@ if __name__ == '__main__':
     parser = ArgumentParser(description = 'Select options.')
 
     parser.add_argument('-o', type = str,
-                        help = 'Organization name for operation')
+                        help = 'Organization name for operation (required)')
     # parser.add_argument('-n', type = str,
     #                     help = 'Network name for operation')
     parser.add_argument('-t', type = str,
