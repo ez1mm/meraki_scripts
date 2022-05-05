@@ -26,7 +26,7 @@ def getNetworks(dashboard, org_id):
 
 
 def getClients(dashboard, net_id):
-    clients = dashboard.networks.getNetworkClients(net_id)
+    clients = dashboard.networks.getNetworkClients(net_id, mac="01:12:23:34:45:56")
     print(f'Found {len(clients)} clients')
     logging.debug(f'networks: {BOLD}{clients}{ENDC}')
     return clients
@@ -53,11 +53,9 @@ def main():
         try:
             networks = getNetworks(dashboard, org["id"])
             for network in networks:
-                # print(f'Network: {network["name"]}')
+                print(f'Network: {network["name"]}')
                 clients = getClients(dashboard, network["id"])
-                #print(clients)
                 for client in clients:
-                    #print(client)
                     print(f'id: {client["id"]} mac: {client["mac"]} desc: {client["description"]} status: {client["status"]}')
 
 
