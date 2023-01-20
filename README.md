@@ -40,3 +40,29 @@ optional arguments:
   -v          verbose
   -d          debug
 ```
+
+# m_mxaddress.py
+
+Meraki MX VLAN Address and Subnet Reader and Re-Writer
+
+## Usage
+### set API key
+```bash
+export APIKEY=<apikey>
+```
+
+### Options
+`m_mxaddress.py` example code to get or set Meraki MX Address and Subnet per VLAN
+```
+usage: m_mxaddress.py [-h] [-o O] [-n N] [-rw] [-v] [-d]
+
+Select options.
+
+optional arguments:
+  -h, --help  show this help message and exit
+  -o O        Organization name for operation (required)
+  -n N        Network name for operation (required)
+  -rw         Re-write subnet addresses
+  -v          verbose
+  -d          debug
+```
