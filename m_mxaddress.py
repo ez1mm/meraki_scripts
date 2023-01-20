@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+import ipaddress
 import logging
 import meraki
 import os
@@ -81,11 +82,10 @@ def main():
 
     if rewrite:
         print()
-        print(f"{BOLD}*** WARNING - THERE IS CURRENTLY NO VALIDATION FOR INPUT ADDRESSING ***{ENDC}")
+        print(f"{BOLD}*** WARNING - THERE IS CURRENTLY MINOR VALIDATION FOR ADDRESSING INPUT ***{ENDC}")
         for subnet in subnets:
             while True:
                 q = input(f"Would you like to rewrite VLAN {subnet['id']}? (Y/N): ")
-
                 try:
                     (q == 'Y' or q == 'N')
                 except ValueError:
@@ -93,8 +93,28 @@ def main():
                     continue
                 
                 if q == "Y":
-                    aIp = input("Enter MX IP: ")
-                    aSubnet = input("Enter Subnet: ")
+                    while True:
+                        aIp = input("Enter MX IP: ")
+                        try:
+                            ip = ipaddress.ip_address(aIp)
+                            break
+                        except ValueError:
+                            print(f"IP address is invalid: {ip}")
+                            continue
+                        except:
+                            print("Enter a valid IP address")
+
+                    while True:
+                        aSubnet = input("Enter Subnet: ")
+                        try:
+                            subnet = ipaddress.ip_network(aSubnet)
+                            break
+                        except ValueError:
+                            print(f"Subnet is invalid: {subnet}")
+                            continue
+                        except:
+                            print("Enter a valid subnet")
+
                     result = updateSubnets(dashboard, spoke['networkId'], subnet['id'], aIp, aSubnet)
                     print(f"\nVlanID: {result['id']:4} Vlan Name: {result['name']:15} MX IP: {result['applianceIp']:16} Subnet: {result['subnet']:20}\n")
                     break
