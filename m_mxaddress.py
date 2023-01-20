@@ -96,10 +96,10 @@ def main():
                     while True:
                         aIp = input("Enter MX IP: ")
                         try:
-                            ip = ipaddress.ip_address(aIp)
+                            aIp = ipaddress.ip_address(aIp)
                             break
                         except ValueError:
-                            print(f"IP address is invalid: {ip}")
+                            print(f"IP address is invalid: {aIp}")
                             continue
                         except:
                             print("Enter a valid IP address")
@@ -107,15 +107,15 @@ def main():
                     while True:
                         aSubnet = input("Enter Subnet: ")
                         try:
-                            subnet = ipaddress.ip_network(aSubnet)
+                            aSubnet = ipaddress.ip_network(aSubnet)
                             break
                         except ValueError:
-                            print(f"Subnet is invalid: {subnet}")
+                            print(f"Subnet is invalid: {aSubnet}")
                             continue
                         except:
                             print("Enter a valid subnet")
 
-                    result = updateSubnets(dashboard, spoke['networkId'], subnet['id'], aIp, aSubnet)
+                    result = updateSubnets(dashboard, spoke['networkId'], subnet['id'], str(aIp), str(aSubnet))
                     print(f"\nVlanID: {result['id']:4} Vlan Name: {result['name']:15} MX IP: {result['applianceIp']:16} Subnet: {result['subnet']:20}\n")
                     break
                 elif q == "N":
