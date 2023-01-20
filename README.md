@@ -7,9 +7,8 @@ git clone https://github.com/ez1mm/meraki_scripts && cd meraki_scripts
 python3 -m venv env
 source env/bin/activate
 python -m pip install -r requirements.txt
+export APIKEY=<APIKEY>
 ```
-Edit config.py and add your API key. 
-https://documentation.meraki.com/General_Administration/Other_Topics/Cisco_Meraki_Dashboard_API
 
 # m_contentFilter.py
 
