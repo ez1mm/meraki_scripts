@@ -7,7 +7,6 @@ git clone https://github.com/ez1mm/meraki_scripts && cd meraki_scripts
 python3 -m venv env
 source env/bin/activate
 python -m pip install -r requirements.txt
-export APIKEY=<APIKEY>
 ```
 
 # m_contentFilter.py
