@@ -18,11 +18,35 @@ def getOrganizations(dashboard):
     return organizations
 
 
-def getNetworks(dashboard, org_id):
-    networks = dashboard.organizations.getOrganizationNetworks(org_id)
+def getNetworks(dashboard, orgId):
+    networks = dashboard.organizations.getOrganizationNetworks(orgId)
     logging.info(f'Found {len(networks)} networks.')
     logging.debug(f'networks: {BOLD}{networks}{ENDC}')
     return networks
+
+
+def getNetwork(dashboard, netId):
+    network = dashboard.networks.getNetwork(netId)
+    logging.info(network)
+    return network
+
+
+def getOrgTemplates(dashboard, orgId):
+    templates = dashboard.organizations.getOrganizationConfigTemplates(orgId)
+    logging.info(templates)
+    return templates
+
+
+def getOrgTemplate(dashboard, orgId, templateId):
+    template = dashboard.organizations.getOrganizationConfigTemplate(orgId, templateId)
+    logging.info(template)
+    return template
+
+
+def getNetworkApplianceVlans(dashboard, templateId):
+    applianceVlans = dashboard.appliance.getNetworkApplianceVlans(templateId)
+    logging.info(applianceVlans)
+    return applianceVlans
 
 
 def getSpoke(dashboard, nId):
@@ -45,6 +69,46 @@ def updateSubnets(dashboard, nId, vlanId, mxIp, mxSubnet):
             applianceIp=mxIp
         )
     return response
+
+
+def ipInSubnet(ip, subnet):
+    if ipaddress.ip_address(ip) in ipaddress.ip_network(subnet):
+        return True
+    else:
+        print("IP address not in template defined subnet")
+        return False
+
+
+def testIp(ip):
+    try:
+        ip = ipaddress.ip_address(ip)
+        return True
+    except ValueError:
+        print(f"IP address is invalid: {ip}")
+        return False
+    except:
+        print(f"IP address is invalid: {ip}")
+        return False
+
+
+def testSubnet(subnet):
+    try:
+        subnet = ipaddress.ip_network(subnet)
+        return True
+    except ValueError:
+        print(f"IP subnet is invalid: {subnet}")
+        return False
+    except:
+        print(f"IP subnet is invalid: {subnet}")
+        return False
+
+
+def subnetInCidr(subnet, cidr):
+    if ipaddress.ip_network(subnet).subnet_of(cidr):
+        return True
+    else:
+        print("IP subnet not in template defined subnet")
+        return False
 
 
 def main():
@@ -72,48 +136,65 @@ def main():
         print(f"{BOLD}Network name {netname} not found{ENDC}")
         sys.exit()
 
-    spoke = getSpoke(dashboard, netId)[0]
-    print(f"\nNetwork: {spoke['name']}   Model: {spoke['model']}   NetworkID: {spoke['networkId']}   Serial: {spoke['serial']}   MAC: {spoke['mac']}\n")
+    templates = getOrgTemplates(dashboard, orgId)
+    template = {t['id']: t for t in templates}
+
+    networkDetail = getNetwork(dashboard, netId)
+    templateId = networkDetail['configTemplateId']
     
+    tVlans = getNetworkApplianceVlans(dashboard, templateId)
+    templateVlans = {tv['id']: tv for tv in tVlans}
+
+    spoke = getSpoke(dashboard, netId)[0]
+    print(f"\nNetworkID:  {spoke['networkId']}   Network:  {netname}")
+    print(f"TemplateID: {templateId}   Template: {template[templateId]['name']}")
+    print()
+    print(f"MX Name: {spoke['name']}")
+    print(f"Serial:  {spoke['serial']}   MAC: {spoke['mac']}\n")
+
     subnets = getSubnets(dashboard, netId)
     print("Addressing & VLANS\nSubnets\n")
     for subnet in subnets:
-        print(f"VlanID: {subnet['id']:4} Vlan Name: {subnet['name']:15} MX IP: {subnet['applianceIp']:16} Subnet: {subnet['subnet']:20}")
+        cidr = ipaddress.ip_network(templateVlans[subnet['id']]['cidr'])
+        mask = templateVlans[subnet['id']]['mask']
+
+        print(f"Vlan {subnet['id']} Template Subnet Definition: /{mask} in {str(cidr)}")
+        print(f"VlanID:    {subnet['id']:<10}     MX IP:  {subnet['applianceIp']:<16}")
+        print(f"Vlan Name: {subnet['name']:<10}     Subnet: {subnet['subnet']:<16}\n")
 
     if rewrite:
         print()
-        print(f"{BOLD}*** WARNING - THERE IS CURRENTLY MINOR VALIDATION FOR ADDRESSING INPUT ***{ENDC}")
         for subnet in subnets:
+            cidr = ipaddress.ip_network(templateVlans[subnet['id']]['cidr'])
+            mask = templateVlans[subnet['id']]['mask']
+            
             while True:
                 q = input(f"Would you like to rewrite VLAN {subnet['id']}? (Y/N): ")
                 try:
                     (q == 'Y' or q == 'N')
                 except ValueError:
                     raise ValueError("Enter Y or N")
-                    continue
                 
                 if q == "Y":
                     while True:
                         aIp = input("Enter MX IP: ")
                         try:
-                            aIp = ipaddress.ip_address(aIp)
-                            break
+                            if (testIp(aIp) and ipInSubnet(aIp, cidr)):
+                                break
                         except ValueError:
-                            print(f"IP address is invalid: {aIp}")
                             continue
                         except:
-                            print("Enter a valid IP address")
+                            print("IP address needs to be valid and within template defined subnet")
 
                     while True:
                         aSubnet = input("Enter Subnet: ")
                         try:
-                            aSubnet = ipaddress.ip_network(aSubnet)
-                            break
+                            if testSubnet(aSubnet) and subnetInCidr(aSubnet, cidr):
+                                break
                         except ValueError:
-                            print(f"Subnet is invalid: {aSubnet}")
                             continue
                         except:
-                            print("Enter a valid subnet")
+                            print("Subnet needs to be valid and within template defined supernet")
 
                     result = updateSubnets(dashboard, spoke['networkId'], subnet['id'], str(aIp), str(aSubnet))
                     print(f"\nVlanID: {result['id']:4} Vlan Name: {result['name']:15} MX IP: {result['applianceIp']:16} Subnet: {result['subnet']:20}\n")
