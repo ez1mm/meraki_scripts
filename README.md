@@ -66,3 +66,33 @@ optional arguments:
   -v          verbose
   -d          debug
 ```
+
+# m_wirelessClientCount.py
+
+Meraki Wireless Client count by band (async)
+
+## Usage
+### set API key
+```bash
+export APIKEY=<apikey>
+```
+Define organization by name with -o or by ID number with -i
+If you want to get one network use -n <network name>
+Without -n all eligible networks will be returned.
+
+### Options
+`m_wirelessClientCount.py` example code to get client counts by band
+```
+usage: m_wirelessClientCount.py [-h] [-o O] [-i I] [-n N] [-t T] [--log] [-v] [-d]
+
+Select options.
+
+options:
+  -h, --help  show this help message and exit
+  -o O        Organization name for operation
+  -i I        Organization ID for operation
+  -n N        Network name for operation
+  -t T        Timespan (days) for operation, up to 7 (Default: 1)
+  --log       Log to file
+  -v          verbose
+  -d          debug
