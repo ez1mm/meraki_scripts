@@ -77,6 +77,9 @@ async def aiomain():
         use_iterator_for_get_pages=False,
         suppress_logging=suppress_logging,
         single_request_timeout=12,
+        maximum_concurrent_requests=50,
+        maximum_retries=100,
+        wait_on_rate_limit=True,
     ) as aiodash:
         
         if not oid:
