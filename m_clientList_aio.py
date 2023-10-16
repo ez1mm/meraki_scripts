@@ -31,7 +31,7 @@ def csv_writer(clients):
     print(f"** Writing {csvfile}")
 
     with open(csvfile, 'w', newline='') as cf:
-        fieldnames = ['network', 'switch_name', 'switch_port', 'client_mac', 'ip', 'status', 'last_seen']
+        fieldnames = ['network', 'device_name', 'switch_port', 'client_mac', 'ip', 'status', 'last_seen']
         writer = csv.DictWriter(cf, fieldnames=fieldnames)
         writer.writeheader()
         for name in clients:
@@ -162,13 +162,6 @@ async def main():
             if SCREEN_OUTPUT:
                 print()
                 for name in client_dict:
-                        # 'network': net_name,
-                        # 'device_name': c['recentDeviceName'],
-                        # 'switch_port': c['switchport'],
-                        # 'client_mac': c['mac'],
-                        # 'ip': c['ip'],
-                        # 'status': c['status'],
-                        # 'last_seen': c['lastSeen'],
                     network = name
                     clients = client_dict[name]
                     for client in clients:
